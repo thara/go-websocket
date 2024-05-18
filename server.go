@@ -15,7 +15,7 @@ import (
 
 func main() {
 	s := &http.Server{
-		Addr:         ":8080",
+		Addr:         ":2345",
 		Handler:      logging(http.HandlerFunc(handler)),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
