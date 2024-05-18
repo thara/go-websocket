@@ -78,6 +78,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		slog.Debug("parseFrame failed", slog.Any("error", err))
 	} else {
 		fmt.Printf("frame: %+v\n", f)
+		fmt.Printf("payload: %s\n", string(f.payload))
 	}
 }
 
@@ -149,6 +150,10 @@ func parseFrame(buf *bufio.Reader) (frame, error) {
 		return frame{}, fmt.Errorf("read failed: expected %d bytes, got %d", length, n)
 	}
 
+	if 0 < len(maskingKey) {
+		maskPayload(payload, maskingKey)
+	}
+
 	f := frame{
 		final:   fin == 0x80,
 		opcode:  op,
@@ -157,4 +162,10 @@ func parseFrame(buf *bufio.Reader) (frame, error) {
 	}
 
 	return f, nil
+}
+
+func maskPayload(payload, maskingKey []byte) {
+	for i := range payload {
+		payload[i] ^= maskingKey[i%4]
+	}
 }
