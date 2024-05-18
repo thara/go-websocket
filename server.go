@@ -73,10 +73,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	f, err := parseFrame(buf.Reader)
-	if err != nil {
-		slog.Debug("parseFrame failed", slog.Any("error", err))
-	} else {
+	for {
+		f, err := parseFrame(buf.Reader)
+		if err != nil {
+			slog.Debug("parseFrame failed", slog.Any("error", err))
+			return
+		}
 		fmt.Printf("frame: %+v\n", f)
 		fmt.Printf("payload: %s\n", string(f.payload))
 	}
